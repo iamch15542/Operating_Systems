@@ -3,12 +3,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-
-#include <semaphore.h>
-
 using namespace std;
-
-sem_t mut;
 int list[1000001], length = 0;
 
 struct PARAMS {
@@ -19,15 +14,8 @@ struct PARAMS {
 pthread_t t[7];
 // merge sort algorithm
 void merge(int start, int mid, int end) {
-
     int len1 = mid - start, len2 = end - mid, idx1 = 0, idx2 = 0, tmp_idx = 0;
     int tmp_arr[len1 + len2];
-    // merge
-    // sem_wait(&mut);
-    // for (int i = start ; i <= end ; i++)
-    //     cout << list[i] << ' ';
-    // cout << '\n';
-    // sem_post(&mut);
     while (idx1 < len1 && idx2 < len2) {
         if (list[start + idx1] <= list[mid + idx2]) {
             tmp_arr[tmp_idx++] = list[start + idx1];
@@ -36,25 +24,15 @@ void merge(int start, int mid, int end) {
             tmp_arr[tmp_idx++] = list[mid + idx2];
             idx2++;
         }
-    } 
-    // sem_wait(&mut);
-    // cout << "idx1:" << idx1 << ' ' << "idx2:" << idx2 << '\n';
-    // sem_post(&mut);
+    }
     while(idx1 < len1) { 
         tmp_arr[tmp_idx++] = list[start + idx1];
         idx1++;
-    } 
+    }
     while(idx2 < len2) { 
         tmp_arr[tmp_idx++] = list[mid + idx2];
         idx2++;
-    } 
-    // sem_wait(&mut);
-    // cout << "sort ok\n";
-    // cout << "tmp_idx: " << tmp_idx << '\n';
-    // for (int i = 0 ; i < tmp_idx ; i++)
-    //     cout << tmp_arr[i] << ' ';
-    // cout << '\n';
-    // sem_post(&mut);
+    }
     for(int i = 0; i < tmp_idx; ++i) {
         list[start + i] = tmp_arr[i];
     }
@@ -62,13 +40,8 @@ void merge(int start, int mid, int end) {
 
 // bubble sort algorithm
 void sort(int low, int high) {
-    for (int i = low ; i < high ; i++)
-        for (int j = low ; j < high - 1 - i + low ; j++)
-            if (list[j] > list[j + 1])
-                swap(list[j], list[j + 1]);
-    /*
-    for (int i = high; i > low; --i) {
-        for (int j = low; j < i; ++j) {
+    for (int i = low; i < high; i++) {
+        for (int j = low; j < high - 1 - i + low; j++) {
             if (list[j] > list[j + 1]) {
                 int tmp = list[j];
                 list[j] = list[j + 1];
@@ -76,7 +49,6 @@ void sort(int low, int high) {
             }
         }
     }
-    */
 }
 
 // simple sort threading function
@@ -99,16 +71,13 @@ void* sort_thread(void* data) {
         end = length;
     }
     sort(start, end);
-    pthread_exit(NULL); // exit child thread 
+    pthread_exit(NULL);
 }
 
 // merge sort threading function
 void* merge_sort_thread(void* data){
     PARAMS *para;
     para = (PARAMS *) data;
-    // sem_wait(&mut);
-    // cout << para->a << " start\n";
-    // sem_post(&mut);
     int num = para->a;
     int start = 0, end  = 0;
     if(num == 4) {
@@ -116,27 +85,20 @@ void* merge_sort_thread(void* data){
         pthread_join(t[1], NULL);
         start = 0;
         end = length / 2;
-        //cout << start << " " << end << " " << num << '\n';
     } else if(num == 5) {
         pthread_join(t[2], NULL);
         pthread_join(t[3], NULL);
-        //start = (length / 2) + 1;
         start = length / 2;
         end = length;
-        //cout << start << " " << end << " " << num << '\n';
     } else if(num == 6) {
         pthread_join(t[4], NULL);
         pthread_join(t[5], NULL);
         start = 0;
         end = length;
-        //cout << start << " " << end << " " << num << '\n';
     }
-    //int mid = start + - start) / 2; 
     int mid = (start + end) / 2;
-    // sort(start, end); 
     merge(start, mid, end);
-    
-    pthread_exit(NULL); // exit child thread 
+    pthread_exit(NULL);
 }
 
 // main fuction
@@ -157,9 +119,9 @@ int main(void) {
     }
     pthread_join(t[6], NULL);
     for(int i = 0; i < length; ++i) {
-        printf("%d ", list[i]);
+        cout << list[i] << " ";
     }
-    printf("\n");
+    cout << '\n';
     return 0;
 }
 
