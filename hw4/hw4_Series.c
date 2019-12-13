@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <semaphore.h>
+#include <unistd.h>
 
 // define global variable
 int arr[10];
 long long length = 0;
 
-// define semaphore
-sem_t sem1;
+// define mutex
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // define thread variable    
 pthread_t t[4];
@@ -21,27 +21,14 @@ struct PARAMS {
 
 // search series
 void search_s(int low, int high, char* s) {
-    // for (int i = low; i < high; i++) {
-    //     for (int j = low; j < high - 1 - i + low; j++) {
-    //         if (list[j] > list[j + 1]) {
-    //             int tmp = list[j];
-    //             list[j] = list[j + 1];
-    //             list[j + 1] = tmp;
-    //         }
-    //     }
-    // }
 
     // write ans into array
-    sem_wait(&sem1);
-    for (int i = low; i < high ; ++i) {
-        int tmp = (int)(*(s+i)) - 48;
-        // printf("asdf%dasdf\n", tmp);
-        // printf("%c", *(s+i));
+    pthread_mutex_lock(&mutex);
+    for (int i = low; i < high; ++i) {
+        int tmp = (int)(*(s + i)) - 48;
         arr[tmp]++;
     }
-    // printf("\n");
-    // printf("mother fuck\n");
-    sem_post(&sem1);
+    pthread_mutex_unlock(&mutex);
 }
 
 
@@ -65,10 +52,7 @@ void* cnt_thread(void* data) {
         start = (length * 3) / thr_num;
         end = length;
     }
-    // sem_wait(&sem1);
     search_s(start, end, series);
-    // printf("%dasdfasdfsadf\n", num);
-    // sem_post(&sem1);
     pthread_exit(NULL);
 }
 
@@ -77,7 +61,6 @@ int main() {
 
     // initial
     int thread_num = 0;
-    sem_init(&sem1, 0, 1);
     struct PARAMS params[7];
     for(int i = 0; i < 10; ++i) {
         arr[i] = 0;
@@ -91,23 +74,21 @@ int main() {
     scanf("%lld", &length);
 
     // get memory to store input
-    char *input = (char*)malloc(sizeof(char) * (length + 10)); 
+    char *input = (char*)malloc(sizeof(char) * (length + 10));
 
     // input series
     scanf("%s", input);
 
     // creating thread_num threads 
-    for (int i = 0; i < thread_num; ++i) {
+    for(int i = 0; i < thread_num; ++i) {
         params[i].a = i;
         params[i].b = thread_num;
         params[i].c = input;
         pthread_create(&t[i], NULL, cnt_thread, (void*)&params[i]);
     }
-    for (int i = 0; i < thread_num; ++i) {
+    for(int i = 0; i < thread_num; ++i) {
         pthread_join(t[i], NULL);
     }
-
-    //printf("%s", input);
 
     // print answer
     for(int i = 0; i < 10; ++i) {
