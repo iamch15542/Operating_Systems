@@ -11,3 +11,9 @@
 **Series** : ```$ ./hw4_Series```
 
 **Pi** : ```$ ./hw4_Pi```
+
+### Test:
+
+**Series** : ```$ make clean && make && make test``` or ```./hw4_Pi```
+
+**Pi** : ```$ make clean && make && make test2``` or ```./hw4_Pi```
