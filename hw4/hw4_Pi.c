@@ -26,12 +26,11 @@ void* cnt_thread(void* data) {
     int num = para->a, per_p = para->b;
     long long cnt = 0;
     double x, y;
-    unsigned int seed = time(NULL);
+    unsigned int seed = rand();
 
     for(int i = (num*per_p); i < (per_p + (num*per_p)); ++i) {
         x = (double)rand_r(&seed)/RAND_MAX;
         y = (double)rand_r(&seed)/RAND_MAX;
-        printf("--------%d, %lf, %lf\n", num, x, y);
         if ((x*x + y*y) <= 1.0) {
             cnt++;
         }
@@ -63,11 +62,12 @@ int main() {
     // per thread need to run
     int per_point = point_number / thread_num;
 
+    srand((unsigned)time(NULL));
+
     // creating thread_num threads 
     for(int i = 0; i < thread_num; ++i) {
         params[i].a = i;
         params[i].b = per_point;
-        params[i].c = i * per_point;
         pthread_create(&t[i], NULL, cnt_thread, (void*)&params[i]);
     }
     for(int i = 0; i < thread_num; ++i) {
@@ -78,6 +78,8 @@ int main() {
     for(int i = 0; i < thread_num; ++i) {
         printf("Thread %d, There are %lld points in the circle\n", i, params[i].c);
     }
+
+    pthread_mutex_destroy(&mutex);
 
     // print answer
     printf("Pi : %lf\n", 4.0 * (double)ans / (double)point_number);
