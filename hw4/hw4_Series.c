@@ -4,10 +4,9 @@
 #include <unistd.h>
 
 // define global variable
-int arr[10];
-long long length = 0;
+long long  arr[10], length = 0;
 
-// define mutex
+// define mutex && initial
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // define thread variable    
@@ -30,7 +29,6 @@ void search_s(int low, int high, char* s) {
     }
     pthread_mutex_unlock(&mutex);
 }
-
 
 // count series
 void* cnt_thread(void* data) {
@@ -92,7 +90,7 @@ int main() {
 
     // print answer
     for(int i = 0; i < 10; ++i) {
-        printf("The total number of %d : %d\n", i, arr[i]);
+        printf("The total number of %d : %lld\n", i, arr[i]);
     }
 
     // free memory

@@ -7,7 +7,7 @@ clean:
 	rm -f gen hw4_Series hw4_Pi output.txt
 
 test:
-	./gen > output.txt && ./hw4_Series < output.txt && rm -f output.txt
+	./gen > output.txt && ./hw4_Series < output.txt
 
 test2:
 	./hw4_Pi	
